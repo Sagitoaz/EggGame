@@ -19,4 +19,8 @@ public class Egg : MonoBehaviour
     {
         _level = level;
     }
+    public int GetLevel()
+    {
+        return _level;
+    }
 }
