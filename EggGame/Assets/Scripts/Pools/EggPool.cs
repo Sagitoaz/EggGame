@@ -43,6 +43,11 @@ public class EggPool : Singleton<EggPool>
     }
     public void ReturnEgg(Egg egg)
     {
+        egg.SetParent(this.transform);
         egg.gameObject.SetActive(false);
+    }
+    public List<EggData> GetAllEggData()
+    {
+        return new List<EggData>(_soEggs);
     }
 }

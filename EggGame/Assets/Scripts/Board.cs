@@ -51,6 +51,7 @@ public class Board : MonoBehaviour
                 _eggs[x, y] = EggPool.Instance.GetEgg();
                 _eggs[x, y].transform.position = new Vector3(position.x, position.y - 0.2f, position.z);
                 _eggs[x, y].name = $"Egg ({x}, {y})";
+                _eggs[x, y].SetParent(node.transform);
                 node.SetLevel(_eggs[x, y].GetLevel());
             }
         }

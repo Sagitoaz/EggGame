@@ -23,4 +23,8 @@ public class Egg : MonoBehaviour
     {
         return _level;
     }
+    public void SetParent(Transform parent)
+    {
+        transform.SetParent(parent);
+    }
 }

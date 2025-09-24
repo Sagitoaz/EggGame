@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class Node : MonoBehaviour
@@ -49,5 +50,23 @@ public class Node : MonoBehaviour
     public void SetLevel(int level)
     {
         this.level = level;
+    }
+    public int GetPosX()
+    {
+        return x;
+    }
+    public int GetPosY()
+    {
+        return y;
+    }
+    public void OnCallNode()
+    {
+        transform.DOMove(transform.position + Vector3.up * 0.05f, 0.1f).SetEase(Ease.OutCubic);
+        _spriteRenderer.DOColor(Color.green, 0.1f).SetEase(Ease.OutCubic);
+    }
+    public void OnReleaseNode()
+    {
+        transform.DOMove(transform.position - Vector3.up * 0.05f, 0.1f).SetEase(Ease.OutCubic);
+        _spriteRenderer.DOColor(Color.white, 0.1f).SetEase(Ease.OutCubic);
     }
 }
