@@ -60,6 +60,7 @@ public class GameManager : Singleton<GameManager>
                 Node n = _grid[pos.x, pos.y];
                 if (n != null)
                 {
+                    n.OnReleaseNode();
                     Egg e = n.GetComponentInChildren<Egg>();
                     if (e != null)
                     {
@@ -87,6 +88,8 @@ public class GameManager : Singleton<GameManager>
                     }
                 }
             }
+            node.OnReleaseNode();
+            _board.ReOrganizeBoard();
         }
         else
         {

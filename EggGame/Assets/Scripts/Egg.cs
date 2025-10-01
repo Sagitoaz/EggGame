@@ -1,3 +1,4 @@
+using DG.Tweening;
 using UnityEngine;
 
 public class Egg : MonoBehaviour
@@ -26,5 +27,7 @@ public class Egg : MonoBehaviour
     public void SetParent(Transform parent)
     {
         transform.SetParent(parent);
+        Vector3 parentPos = new Vector3(parent.position.x, parent.position.y - 0.2f, parent.position.z);
+        transform.DOMove(parentPos, 0.2f);
     }
 }

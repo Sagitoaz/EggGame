@@ -8,7 +8,6 @@ public class Board : MonoBehaviour
     [SerializeField] private Node[] _nodePrefabs;
     private SpriteRenderer _spriteRenderer;
     private Node[,] _grid;
-    private Egg[,] _eggs;
     private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -16,7 +15,6 @@ public class Board : MonoBehaviour
     private void Start()
     {
         _grid = new Node[_width, _height];
-        _eggs = new Egg[_width, _height];
         InitializeBoard();
     }
     private void InitializeBoard()
@@ -48,11 +46,39 @@ public class Board : MonoBehaviour
                 orderinLayer--;
 
                 // Get an egg from the pool
-                _eggs[x, y] = EggPool.Instance.GetEgg();
-                _eggs[x, y].transform.position = new Vector3(position.x, position.y - 0.2f, position.z);
-                _eggs[x, y].name = $"Egg ({x}, {y})";
-                _eggs[x, y].SetParent(node.transform);
-                node.SetLevel(_eggs[x, y].GetLevel());
+                Egg egg = EggPool.Instance.GetEgg();
+                egg.name = $"Egg ({x}, {y})";
+                egg.SetParent(node.transform);
+                node.SetLevel(egg.GetLevel());
+            }
+        }
+    }
+    public void ReOrganizeBoard()
+    {
+        Debug.Log("Reorganizing Board...");
+        for (int x = 0; x < _width; x++)
+        {
+            for (int y = 1; y < _height; y++)
+            {
+                int bot = y;
+                Egg egg = _grid[x, y].GetComponentInChildren<Egg>();
+                if (egg == null)
+                {
+                    Debug.LogWarning($"No egg found at position ({x}, {y})");
+                    continue;
+                }
+                bot--;
+                if (_grid[x, bot].GetLevel() == 0)
+                {
+                    while (bot >= 0 && _grid[x, bot].GetLevel() == 0)
+                    {
+                        Debug.Log(x + " " + bot);
+                        _grid[x, bot + 1].SetLevel(0);
+                        egg.SetParent(_grid[x, bot].transform);
+                        _grid[x, bot].SetLevel(egg.GetLevel());
+                        bot--;
+                    }
+                }
             }
         }
     }
