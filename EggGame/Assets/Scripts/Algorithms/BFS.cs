@@ -1,66 +1,63 @@
+// BFS.cs
 using System.Collections.Generic;
 using UnityEngine;
 
+public class BfsResult
+{
+    public Dictionary<Vector2Int, int> depth = new Dictionary<Vector2Int, int>();
+    public Dictionary<Vector2Int, Vector2Int> parent = new Dictionary<Vector2Int, Vector2Int>();
+    public List<Vector2Int> nodes = new List<Vector2Int>();
+    public int maxDepth = 0;
+}
+
 public static class BFS
 {
-    private static Vector2Int[] directions = new Vector2Int[]
-    {
-        new Vector2Int(0, 1),   // Up
-        new Vector2Int(1, 0),   // Right
-        new Vector2Int(0, -1),  // Down
-        new Vector2Int(-1, 0)   // Left
+    private static Vector2Int[] directions = new Vector2Int[] {
+        new Vector2Int(0, 1), new Vector2Int(1, 0),
+        new Vector2Int(0, -1), new Vector2Int(-1, 0)
     };
-    public static List<Vector2Int> FindConnectedSameLevel(Node[,] grid, Vector2Int start, bool includeStart = false)
+
+    public static BfsResult FindSameLevelWithDepth(Node[,] grid, Vector2Int start, bool includeStart = false)
     {
-        List<Vector2Int> result = new List<Vector2Int>();
-
-        if (grid == null) return result;
-
-        int width = grid.GetLength(0);
-        int height = grid.GetLength(1);
-
-        // Guard: start must be inside bounds and not null
-        if (start.x < 0 || start.x >= width || start.y < 0 || start.y >= height) return result;
+        var res = new BfsResult();
+        if (grid == null) return res;
+        int w = grid.GetLength(0), h = grid.GetLength(1);
+        if (start.x < 0 || start.x >= w || start.y < 0 || start.y >= h) return res;
         Node startNode = grid[start.x, start.y];
-        if (startNode == null) return result;
+        if (startNode == null) return res;
 
-        int targetLevel = startNode.GetLevel();
-
-        Queue<Vector2Int> queue = new Queue<Vector2Int>();
+        int targetLv = startNode.GetLevel();
+        Queue<Vector2Int> q = new Queue<Vector2Int>();
         HashSet<Vector2Int> visited = new HashSet<Vector2Int>();
 
-        queue.Enqueue(start);
+        q.Enqueue(start);
         visited.Add(start);
+        res.depth[start] = 0;
+        if (includeStart) res.nodes.Add(start);
 
-        if (includeStart)
+        while (q.Count > 0)
         {
-            result.Add(start);
-        }
-
-        while (queue.Count > 0)
-        {
-            Vector2Int current = queue.Dequeue();
-            foreach (Vector2Int dir in directions)
+            var cur = q.Dequeue();
+            foreach (var d in directions)
             {
-                Vector2Int neighbor = current + dir;
-                if (!IsInBounds(neighbor, width, height) || visited.Contains(neighbor))
-                    continue;
+                var nb = cur + d;
+                if (nb.x < 0 || nb.x >= w || nb.y < 0 || nb.y >= h) continue;
+                if (visited.Contains(nb)) continue;
 
-                Node neighborNode = grid[neighbor.x, neighbor.y];
-                if (neighborNode != null && neighborNode.GetLevel() == targetLevel)
+                Node nbNode = grid[nb.x, nb.y];
+                if (nbNode != null && nbNode.GetLevel() == targetLv)
                 {
-                    visited.Add(neighbor);
-                    queue.Enqueue(neighbor);
-                    result.Add(neighbor);
-                    neighborNode.OnCallNode();
+                    visited.Add(nb);
+                    q.Enqueue(nb);
+                    res.parent[nb] = cur;
+                    int dep = res.depth[cur] + 1;
+                    res.depth[nb] = dep;
+                    res.maxDepth = Mathf.Max(res.maxDepth, dep);
+                    res.nodes.Add(nb);
+                    nbNode.OnCallNode();
                 }
             }
         }
-
-        return result;
-    }
-    private static bool IsInBounds(Vector2Int pos, int width, int height)
-    {
-        return pos.x >= 0 && pos.x < width && pos.y >= 0 && pos.y < height;
+        return res;
     }
 }
