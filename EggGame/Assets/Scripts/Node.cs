@@ -9,6 +9,7 @@ public class Node : MonoBehaviour
     private int level;
     private int x, y;
     private SpriteRenderer _spriteRenderer;
+    private Egg _currentEgg; // Cache egg reference for performance
     private void Awake()
     {
         _spriteRenderer = GetComponent<SpriteRenderer>();
@@ -68,5 +69,34 @@ public class Node : MonoBehaviour
     {
         transform.DOMove(transform.position - Vector3.up * 0.05f, 0.1f).SetEase(Ease.OutCubic);
         _spriteRenderer.DOColor(Color.white, 0.1f).SetEase(Ease.OutCubic);
+    }
+
+    public void SetEgg(Egg egg)
+    {
+        _currentEgg = egg;
+        if (egg != null)
+        {
+            SetLevel(egg.GetLevel());
+        }
+        else
+        {
+            SetLevel(0);
+        }
+    }
+
+    public Egg GetEgg()
+    {
+        return _currentEgg;
+    }
+
+    public bool HasEgg()
+    {
+        return _currentEgg != null;
+    }
+
+    public void RemoveEgg()
+    {
+        _currentEgg = null;
+        SetLevel(0);
     }
 }

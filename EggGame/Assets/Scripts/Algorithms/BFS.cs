@@ -13,8 +13,10 @@ public class BfsResult
 public static class BFS
 {
     private static Vector2Int[] directions = new Vector2Int[] {
-        new Vector2Int(0, 1), new Vector2Int(1, 0),
-        new Vector2Int(0, -1), new Vector2Int(-1, 0)
+        new Vector2Int(0, 1), // Up
+        new Vector2Int(1, 0), // Right
+        new Vector2Int(0, -1), // Down
+        new Vector2Int(-1, 0) // Left
     };
 
     public static BfsResult FindSameLevelWithDepth(Node[,] grid, Vector2Int start, bool includeStart = false)
@@ -37,10 +39,10 @@ public static class BFS
 
         while (q.Count > 0)
         {
-            var cur = q.Dequeue();
-            foreach (var d in directions)
+            Vector2Int cur = q.Dequeue();
+            foreach (Vector2Int d in directions)
             {
-                var nb = cur + d;
+                Vector2Int nb = cur + d;
                 if (nb.x < 0 || nb.x >= w || nb.y < 0 || nb.y >= h) continue;
                 if (visited.Contains(nb)) continue;
 

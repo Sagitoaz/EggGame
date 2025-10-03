@@ -30,6 +30,12 @@ public class Egg : MonoBehaviour
         transform.SetParent(parent);
         Vector3 parentPos = new Vector3(parent.position.x, parent.position.y - 0.2f, parent.position.z);
         transform.DOMove(parentPos, 0.2f);
+        
+        Node parentNode = parent.GetComponent<Node>();
+        if (parentNode != null)
+        {
+            parentNode.SetEgg(this);
+        }
     }
 
     public void MoveTo(Transform target, float duration, Action onComplete = null)
@@ -44,5 +50,12 @@ public class Egg : MonoBehaviour
     public void AttachTo(Transform parent)
     {
         transform.SetParent(parent, true);
+        
+        // Update node reference for performance  
+        Node parentNode = parent.GetComponent<Node>();
+        if (parentNode != null)
+        {
+            parentNode.SetEgg(this);
+        }
     }
 }

@@ -16,6 +16,12 @@ public class Board : MonoBehaviour
     {
         _grid = new Node[_width, _height];
         InitializeBoard();
+
+        EventManager.onReorganizeBoard += ReOrganizeBoard;
+    }
+    private void OnDestroy()
+    {
+        EventManager.onReorganizeBoard -= ReOrganizeBoard;
     }
     private void InitializeBoard()
     {
@@ -55,27 +61,23 @@ public class Board : MonoBehaviour
     }
     public void ReOrganizeBoard()
     {
-        Debug.Log("Reorganizing Board...");
         for (int x = 0; x < _width; x++)
         {
             for (int y = 1; y < _height; y++)
             {
                 int bot = y;
-                Egg egg = _grid[x, y].GetComponentInChildren<Egg>();
+                Egg egg = _grid[x, y].GetEgg();
                 if (egg == null)
                 {
-                    Debug.LogWarning($"No egg found at position ({x}, {y})");
                     continue;
                 }
                 bot--;
                 if (_grid[x, bot].GetLevel() == 0)
                 {
                     while (bot >= 0 && _grid[x, bot].GetLevel() == 0)
-                    {
-                        Debug.Log(x + " " + bot);
-                        _grid[x, bot + 1].SetLevel(0);
-                        egg.SetParent(_grid[x, bot].transform);
-                        _grid[x, bot].SetLevel(egg.GetLevel());
+                    {                        
+                        _grid[x, bot + 1].RemoveEgg();
+                        egg.SetParent(_grid[x, bot].transform);                        
                         bot--;
                     }
                 }
@@ -85,5 +87,35 @@ public class Board : MonoBehaviour
     public Node[,] GetGrid()
     {
         return _grid;
+    }
+
+    // Debug method to validate egg references
+    [ContextMenu("Validate Egg References")]
+    public void ValidateEggReferences()
+    {
+        int validReferences = 0;
+        int invalidReferences = 0;
+        
+        for (int x = 0; x < _width; x++)
+        {
+            for (int y = 0; y < _height; y++)
+            {
+                Node node = _grid[x, y];
+                Egg eggRef = node.GetEgg();
+                Egg eggChild = node.GetComponentInChildren<Egg>();
+                
+                if (eggRef == eggChild)
+                {
+                    validReferences++;
+                }
+                else
+                {
+                    invalidReferences++;
+                    Debug.LogWarning($"Egg reference mismatch at ({x}, {y}): ref={eggRef}, child={eggChild}");
+                }
+            }
+        }
+        
+        Debug.Log($"Egg Reference Validation: {validReferences} valid, {invalidReferences} invalid");
     }
 }
