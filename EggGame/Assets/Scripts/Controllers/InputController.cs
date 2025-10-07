@@ -46,6 +46,7 @@ public class InputController : MonoBehaviour
         if (hit != null)
         {
             Node node = hit.GetComponent<Node>();
+            if (node.GetLevel() <= 0) return;
             if (node != null)
             {
                 EventManager.onNodeClicked?.Invoke(node);

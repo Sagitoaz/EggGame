@@ -36,8 +36,6 @@ public class GameLogicController : MonoBehaviour
         // Ignore input while merging
         if (_isMerging) return;
 
-        Debug.Log(clickedNode.GetLevel());
-
         if (_selectedNode == null)
         {
             // First click on node

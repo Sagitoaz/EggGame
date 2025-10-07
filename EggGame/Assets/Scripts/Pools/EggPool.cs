@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class EggPool : Singleton<EggPool>
 {
@@ -29,7 +30,7 @@ public class EggPool : Singleton<EggPool>
             if (!egg.gameObject.activeInHierarchy)
             {
                 egg.gameObject.SetActive(true);
-                int eggData = Random.Range(0, _soEggs.Length);
+                int eggData = Random.Range(0, 3);
                 egg.SetLevel(_soEggs[eggData].Level);
                 egg.SetImage(_soEggs[eggData].EggSprite);
                 return egg;
@@ -43,7 +44,17 @@ public class EggPool : Singleton<EggPool>
     }
     public void ReturnEgg(Egg egg)
     {
-        egg.SetParent(this.transform);
+        if (egg == null) return;
+        
+        // Stop all animations first
+        DOTween.Kill(egg);
+        egg.transform.DOKill();
+        
+        // Reset position and parent
+        egg.gameObject.transform.position = this.transform.position;
+        egg.SetParentByTransform(this.transform);
+        
+        // Deactivate the egg
         egg.gameObject.SetActive(false);
     }
     public List<EggData> GetAllEggData()

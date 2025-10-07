@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class MergeController : MonoBehaviour
 {
@@ -92,12 +93,18 @@ public class MergeController : MonoBehaviour
     {
         bool moveCompleted = false;
         
+        // Clean up source node immediately
+        sourceNode.RemoveEgg();
+        sourceNode.OnReleaseNode();
+        
         sourceEgg.MoveTo(targetNode.transform, 0.15f, () =>
         {
-            // Return egg to pool and clean up source node
+            // Stop all animations on the egg before returning to pool
+            DOTween.Kill(sourceEgg);
+            sourceEgg.transform.DOKill();
+            
+            // Return egg to pool immediately after animation
             EggPool.Instance.ReturnEgg(sourceEgg);
-            sourceNode.RemoveEgg(); // Use optimized method instead of SetLevel(0)
-            sourceNode.OnReleaseNode();
             moveCompleted = true;
         });
 

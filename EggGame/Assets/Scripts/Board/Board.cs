@@ -29,7 +29,7 @@ public class Board : MonoBehaviour
         float nodeWidth = tmpNode.GetWidth();
         float nodeHeight = tmpNode.GetHeight() - 0.05f;
         Destroy(tmpNode.gameObject);
-        int orderinLayer = -1;
+        int orderinLayer = -5;
 
         // Resize the board background
         _spriteRenderer.size = new Vector2(_width * nodeWidth + 0.15f, _height * nodeHeight + 0.15f);
@@ -54,7 +54,7 @@ public class Board : MonoBehaviour
                 // Get an egg from the pool
                 Egg egg = EggPool.Instance.GetEgg();
                 egg.name = $"Egg ({x}, {y})";
-                egg.SetParent(node.transform);
+                egg.SetParent(node);
                 node.SetLevel(egg.GetLevel());
             }
         }
@@ -65,57 +65,57 @@ public class Board : MonoBehaviour
         {
             for (int y = 1; y < _height; y++)
             {
-                int bot = y;
-                Egg egg = _grid[x, y].GetEgg();
+                Node currentNode = _grid[x, y];
+                Egg egg = currentNode.GetEgg();
                 if (egg == null)
                 {
                     continue;
                 }
-                bot--;
-                if (_grid[x, bot].GetLevel() == 0)
+                
+                // Find the lowest empty spot
+                int targetY = y - 1;
+                while (targetY >= 0 && _grid[x, targetY].GetLevel() == 0 && _grid[x, targetY].GetEgg() == null)
                 {
-                    while (bot >= 0 && _grid[x, bot].GetLevel() == 0)
-                    {                        
-                        _grid[x, bot + 1].RemoveEgg();
-                        egg.SetParent(_grid[x, bot].transform);                        
-                        bot--;
-                    }
+                    targetY--;
+                }
+                targetY++; // Move back to the first empty spot
+                
+                // If we found a lower spot, move the egg there
+                if (targetY < y)
+                {
+                    Node targetNode = _grid[x, targetY];
+                    
+                    // Remove egg from current node
+                    currentNode.RemoveEgg();
+                    
+                    // Move egg to target node
+                    egg.SetParent(targetNode);
                 }
             }
         }
+        SpawnNewEgg();
     }
     public Node[,] GetGrid()
     {
         return _grid;
     }
-
-    // Debug method to validate egg references
-    [ContextMenu("Validate Egg References")]
-    public void ValidateEggReferences()
+    
+    // Debug method to clean up orphaned eggs
+    private void SpawnNewEgg()
     {
-        int validReferences = 0;
-        int invalidReferences = 0;
-        
         for (int x = 0; x < _width; x++)
         {
             for (int y = 0; y < _height; y++)
             {
                 Node node = _grid[x, y];
-                Egg eggRef = node.GetEgg();
-                Egg eggChild = node.GetComponentInChildren<Egg>();
-                
-                if (eggRef == eggChild)
+                // Only spawn new egg if node has no egg AND level is 0
+                if (node.GetLevel() == 0 && node.GetEgg() == null)
                 {
-                    validReferences++;
-                }
-                else
-                {
-                    invalidReferences++;
-                    Debug.LogWarning($"Egg reference mismatch at ({x}, {y}): ref={eggRef}, child={eggChild}");
+                    Egg egg = EggPool.Instance.GetEgg();
+                    egg.name = $"Egg ({x}, {y})";
+                    egg.SetParent(node);
                 }
             }
         }
-        
-        Debug.Log($"Egg Reference Validation: {validReferences} valid, {invalidReferences} invalid");
     }
 }

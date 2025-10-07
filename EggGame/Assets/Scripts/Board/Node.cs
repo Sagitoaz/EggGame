@@ -36,6 +36,14 @@ public class Node : MonoBehaviour
             _spriteRenderer.sortingOrder = order;
         }
     }
+    public int GetOrderInLayer()
+    {
+        if (_spriteRenderer != null)
+        {
+            return _spriteRenderer.sortingOrder;
+        }
+        return 0;
+    }
     public void SetUsed(bool isUsed)
     {
         _isUsed = isUsed;
@@ -74,6 +82,7 @@ public class Node : MonoBehaviour
     public void SetEgg(Egg egg)
     {
         _currentEgg = egg;
+        egg.SetOrderInLayer(_spriteRenderer.sortingOrder + 100);
         if (egg != null)
         {
             SetLevel(egg.GetLevel());
